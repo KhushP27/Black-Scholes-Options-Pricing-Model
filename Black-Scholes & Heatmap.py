@@ -11,37 +11,37 @@ st.set_page_config(layout="wide")
 # Sample Data for Heatmap
 def calculate_call_price(spot, vol, strike, time, risk):
     call_data = []
-    for price in spot:
+    for v in vol: # Loop now iterates over volatilities in rows
         call_row = []
-        for v in vol:
+        for price in spot:
             # Black-Scholes Call Option Price Calculation
             call_price = price * norm.cdf((np.log(price / strike) + (risk + 0.5 * v**2) * time) / (v * np.sqrt(time))) - \
                         strike * np.exp(-risk * time) * norm.cdf((np.log(price / strike) + (risk - 0.5 * v**2) * time) / (v * np.sqrt(time)))
             call_row.append(call_price)
         call_data.append(call_row)
-    return pd.DataFrame(call_data, index=spot, columns=vol)
+    return pd.DataFrame(call_data, index=vol, columns=spot)
 
 def calculate_put_price(spot, vol, strike, time, risk):
     put_data = []
-    for price in spot:
+    for v in vol:
         put_row = []
-        for v in vol:
+        for price in spot:
             # Black-Scholes Put Option Price Calculation
             put_price = strike * np.exp(-risk * time) * norm.cdf(-(np.log(price / strike) + (risk + 0.5 * v**2) * time) / (v * np.sqrt(time))) - \
                        price * norm.cdf(-(np.log(price / strike) + (risk + 0.5 * v**2) * time) / (v * np.sqrt(time)))
             put_row.append(put_price)
         put_data.append(put_row)
-    return pd.DataFrame(put_data, index=spot, columns=vol)
+    return pd.DataFrame(put_data, index=vol, columns=spot)
 
 # Heatmap Function
 def plot_heatmap(data, title_suffix=""):
     plt.figure(figsize=(15, 12))
     ax = sns.heatmap(data, annot=True, cmap="coolwarm", fmt=".2f", 
                      cbar_kws={'label': 'Option Price'})
-    ax.set_xticklabels([f'{x:.2f}' for x in data.columns])
-    ax.set_yticklabels([f'{x:.2f}' for x in data.index])
-    ax.set_xlabel('Volatility')
-    ax.set_ylabel('Stock Price')
+    ax.set_xticklabels([f'{x:.2f}' for x in data.columns]) # Spot prices on x axis
+    ax.set_yticklabels([f'{x:.2f}' for x in data.index]) # Volatilities on y axis
+    ax.set_xlabel('Stock Price')
+    ax.set_ylabel('Volatility')
     plt.title(f"Option Price Heatmap {title_suffix}")
     st.pyplot(plt)
 
