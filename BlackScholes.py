@@ -6,16 +6,18 @@ import streamlit as st
 from scipy.stats import norm
 from matplotlib.colors import LinearSegmentedColormap
 
-# Add this at the very top of your script, after the imports
+# Set up a wide layout for better visualization of multiple heatmaps
 st.set_page_config(layout="wide")
 
-# Sample Data for Heatmap
+# Core pricing functions for options using Black-Scholes model
 def calculate_call_price(spot, vol, strike, time, risk):
     call_data = []
-    for v in vol: # Loop now iterates over volatilities in rows
+    for v in vol:  # Iterate through volatility levels
         call_row = []
         for price in spot:
-            # Black-Scholes Call Option Price Calculation
+            # Standard Black-Scholes formula for European call options
+            # First term: Spot price * N(d1)
+            # Second term: Present value of strike * N(d2)
             call_price = price * norm.cdf((np.log(price / strike) + (risk + 0.5 * v**2) * time) / (v * np.sqrt(time))) - \
                         strike * np.exp(-risk * time) * norm.cdf((np.log(price / strike) + (risk - 0.5 * v**2) * time) / (v * np.sqrt(time)))
             call_row.append(call_price)
@@ -27,7 +29,7 @@ def calculate_put_price(spot, vol, strike, time, risk):
     for v in vol:
         put_row = []
         for price in spot:
-            # Black-Scholes Put Option Price Calculation
+            # Put-Call parity relationship used to derive put option price
             put_price = strike * np.exp(-risk * time) * norm.cdf(-(np.log(price/strike) + (risk - 0.5 * v**2) * time) / (v * np.sqrt(time))) - \
                        price * norm.cdf(-(np.log(price/strike) + (risk + 0.5 * v**2) * time) / (v * np.sqrt(time)))
             put_row.append(put_price)
@@ -38,15 +40,16 @@ def calculate_put_price(spot, vol, strike, time, risk):
 def plot_heatmap(data, title_suffix=""):
     plt.figure(figsize=(10, 8))
     
-    # Use different colormaps for P&L vs regular price heatmaps
+    # Color scheme selection based on visualization type
     if "P&L" in title_suffix:
-        # Create custom colormap: red for negative, white for zero, green for positive
-        colors = [(0.8, 0, 0), (1, 1, 1), (0, 0.8, 0)]  # dark red to white to dark green
-        n_bins = 100  # More bins for smooth transition
+        # Red-White-Green colormap for P&L:
+        colors = [(0.8, 0, 0), (1, 1, 1), (0, 0.8, 0)]
+        n_bins = 100  # Higher bin count for smoother gradient
         cmap = LinearSegmentedColormap.from_list("custom", colors, N=n_bins)
         center = 0
     else:
-        # For regular price heatmaps, use viridis (no center needed)
+        # Default to viridis for price visualization
+        # Better for showing continuous price ranges
         cmap = "viridis"
         center = None
     
@@ -66,10 +69,10 @@ def plot_heatmap(data, title_suffix=""):
 # Streamlit App
 st.title("Black-Scholes Option Heatmap")
 
-# User Inputs
+# Sidebar controls for option parameters
 st.sidebar.header("Inputs")
 
-# Inputs for specific option calculation
+# Parameters for calculating individual option prices
 st.sidebar.header("Single Option Parameters")
 strike = st.sidebar.number_input("Strike Price", min_value=1.0, max_value=200.0, value=100.0, step=1.0)
 time = st.sidebar.number_input("Time to Expiration (years)", min_value=0.1, max_value=2.0, value=1.00, step=0.1)
@@ -77,7 +80,8 @@ risk_free_interest_rate = st.sidebar.number_input("Risk Free Interest Rate", min
 volatility = st.sidebar.number_input("Volatility", min_value=0.01, max_value=1.00, value=0.20, step=0.01)
 spot = st.sidebar.number_input("Spot Price", min_value=1.0, max_value=200.0, value=100.0, step=1.0)
 
-# Calculate single option prices directly using Black-Scholes formulas
+# Calculate option prices using Black-Scholes formula
+# d1 and d2 are the standard normal probabilities used in the B-S formula
 d1 = (np.log(spot/strike) + (risk_free_interest_rate + 0.5 * volatility**2) * time) / (volatility * np.sqrt(time))
 d2 = d1 - volatility * np.sqrt(time)
 
@@ -103,9 +107,10 @@ volatility_range = st.sidebar.slider("Volatility Range for Heatmap (0-1)", 0.1, 
 user_call = st.sidebar.number_input("Input Call Price", value=None)
 user_put = st.sidebar.number_input("Input Put Price", value=None)
 
-# Generate Data
-spot_prices = np.linspace(spot_price_range[0], spot_price_range[1], 10) # Takes 10 evenly spaced spot prices in the spot range specified by the user
-volatilities = np.linspace(volatility_range[0], volatility_range[1], 10) # Takes 10 evenly spaced volatilies in the volatility range specified by the user
+# Generate price ranges for heatmap visualization
+# Creates 10 evenly spaced points for both stock price and volatility
+spot_prices = np.linspace(spot_price_range[0], spot_price_range[1], 10)
+volatilities = np.linspace(volatility_range[0], volatility_range[1], 10)
 
 # Call and Put Data Calculations
 call_data = calculate_call_price(spot_prices, volatilities, strike, time, risk_free_interest_rate)
