@@ -1,4 +1,4 @@
-# Black-Scholes-Options-Pricing-Model by [Khush Patel](https://www.linkedin.com/in/khush-patel-1aa4841b4/) [Jerry Huang](https://www.linkedin.com/in/jerry-huang-4b9a602a1/)
+# Black-Scholes-Options-Pricing-Model by [Jerry Huang](https://www.linkedin.com/in/jerry-huang-4b9a602a1/) [Khush Patel](https://www.linkedin.com/in/khush-patel-1aa4841b4/)
 This Streamlit app provides a user-friendly interface for visualizing option prices calculated using the Black-Scholes model. The app generates interactive heatmaps for call and put option prices based on user-defined inputs, allowing users to explore the relationship between stock prices, volatilities, and option prices.
 
 ## Key Features
