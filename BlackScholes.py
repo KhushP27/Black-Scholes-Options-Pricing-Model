@@ -71,7 +71,7 @@ st.sidebar.header("Inputs")
 
 # Inputs for specific option calculation
 st.sidebar.header("Single Option Parameters")
-strike = st.sidebar.number_input("Strike Price", min_value=1.0, max_value=200.0, value=120.0, step=1.0)
+strike = st.sidebar.number_input("Strike Price", min_value=1.0, max_value=200.0, value=100.0, step=1.0)
 time = st.sidebar.number_input("Time to Expiration (years)", min_value=0.1, max_value=2.0, value=1.00, step=0.1)
 risk_free_interest_rate = st.sidebar.number_input("Risk Free Interest Rate", min_value=0.01, max_value=1.0, value=0.05, step=0.01)
 volatility = st.sidebar.number_input("Volatility", min_value=0.01, max_value=1.00, value=0.20, step=0.01)
